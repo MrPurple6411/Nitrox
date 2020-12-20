@@ -292,17 +292,49 @@ namespace NitroxLauncher
                 FileName = subnauticaExe
             };
 
-            if (PlatformDetection.IsEpic(subnauticaPath))
+            string vrmodefile = Path.Combine(subnauticaPath, "vrmode");
+            string vrmode = "none";
+
+            if (File.Exists(vrmodefile))
             {
-                startInfo.Arguments = "-EpicPortal -vrmode none";
+                try
+                {
+                    vrmode = File.ReadAllText(vrmodefile).ToLower();
+                }
+                catch(Exception e)
+                {
+                    throw new Exception($"Unable to read vrmode config file due to Exception:\n{e}");
+                }
             }
-            else if (PlatformDetection.IsSteam(subnauticaPath))
+
+            string vrArguments = "-vrmode none";
+
+            switch (vrmode)
             {
-                startInfo.FileName = "steam://run/264710";
+                case "oculus":
+                    vrArguments = "-openVR -vrmode Oculus";
+                    break;
+                case "steamvr":
+                    vrArguments = "-openVR -vrmode SteamVR";
+                    break;
+                default:
+                    break;
             }
-            else if (PlatformDetection.IsMicrosoftStore(subnauticaPath))
+
+            PlatformDetection.Platform platform = PlatformDetection.GetPlatform(subnauticaPath);
+            switch (platform)
             {
-                startInfo.FileName = "ms-xbl-38616e6e:\\";
+                case PlatformDetection.Platform.Epic:
+                    startInfo.Arguments = "-EpicPortal " + vrArguments;
+                    break;
+                case PlatformDetection.Platform.Steam:
+                    startInfo.Arguments = vrArguments;
+                    break;
+                case PlatformDetection.Platform.Microsoft:
+                    startInfo.FileName = "ms-xbl-38616e6e:\\";
+                    break;
+                case PlatformDetection.Platform.None:
+                    throw new Exception($"Unable to detect Game Platform!");
             }
             return Process.Start(startInfo);
         }

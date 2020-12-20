@@ -4,31 +4,30 @@ namespace NitroxLauncher.Patching
 {
     public class PlatformDetection
     {
-        public static bool IsEpic(string subnauticaPath)
+        internal static Platform GetPlatform(string subnauticaPath)
         {
 
             if (Directory.Exists(Path.Combine(subnauticaPath, ".egstore")))
             {
-                return true;
+                return Platform.Epic;
             }
-            return false;
+            else if (File.Exists(Path.Combine(subnauticaPath, "Subnautica_Data", "Plugins", "CSteamworks.dll")))
+            {
+                return Platform.Steam;
+            }
+            else if (File.Exists(Path.Combine(subnauticaPath, "appxmanifest.xml")))
+            {
+                return Platform.Microsoft;
+            }
+            return Platform.None;
         }
 
-        public static bool IsSteam(string subnauticaPath)
+        internal enum Platform
         {
-            if (File.Exists(Path.Combine(subnauticaPath, "Subnautica_Data", "Plugins", "CSteamworks.dll")))
-            {
-                return true;
-            }
-            return false;
-        }
-        public static bool IsMicrosoftStore(string subnauticaPath)
-        {
-            if (File.Exists(Path.Combine(subnauticaPath, "appxmanifest.xml")))
-            {
-                return true;
-            }
-            return false;
+            Epic,
+            Steam,
+            Microsoft,
+            None
         }
     }
 }

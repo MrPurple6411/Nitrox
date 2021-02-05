@@ -328,7 +328,15 @@ namespace NitroxLauncher
                     startInfo.Arguments = "-EpicPortal " + vrArguments;
                     break;
                 case PlatformDetection.Platform.Steam:
-                    startInfo.Arguments = vrArguments;
+                    if(vrArguments == "-vrmode none")
+                    {
+                        startInfo.FileName = "steam://rungameid/264710";
+                    }
+                    else
+                    {
+                        startInfo.Arguments = vrArguments;
+                    }
+
                     break;
                 case PlatformDetection.Platform.Microsoft:
                     startInfo.FileName = "ms-xbl-38616e6e:\\";
